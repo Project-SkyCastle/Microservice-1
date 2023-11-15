@@ -18,7 +18,7 @@ async def root():
 async def get_all_users():
     """Fetch all users."""
 
-    sql = "SELECT user_id, email, created, role FROM users"
+    sql = "SELECT user_id, email, created, role, discord_url FROM users"
 
     with db.conn.cursor(row_factory=class_row(User)) as cur:
         cur.execute(sql)
@@ -30,6 +30,7 @@ async def get_all_users():
                 "email": row.email,
                 "created": row.created,
                 "role": row.role,
+                "discord_url": row.discord_url,
             }
             for row in res
         ]
@@ -39,7 +40,7 @@ async def get_all_users():
 async def get_user(user_id: str):
     """Fetch the user info with user_id=user_id."""
 
-    sql = "SELECT user_id, email, created, role FROM users WHERE user_id=%(user_id)s"
+    sql = "SELECT user_id, email, created, role, discord_url FROM users WHERE user_id=%(user_id)s"
 
     with db.conn.cursor(row_factory=class_row(User)) as cur:
         cur.execute(sql, {"user_id": user_id})
@@ -54,6 +55,7 @@ async def get_user(user_id: str):
             "email": res.email,
             "created": res.created,
             "role": res.role,
+            "discord_url": res.discord_url,
         }
 
 
@@ -61,7 +63,8 @@ async def get_user(user_id: str):
 async def create_user(user: User):
     """Creates a new user and returns the user's id."""
 
-    sql = "INSERT into users(user_id, email, created, role) VALUES (%(user_id)s, %(email)s, %(created)s, %(role)s) RETURNING *"
+    sql = ("INSERT into users(user_id, email, created, role, discord_url) "
+           "VALUES (%(user_id)s, %(email)s, %(created)s, %(role)s, %(discord_url)s) RETURNING *")
 
     with db.conn.cursor(row_factory=class_row(User)) as cur:
         user_id = uuid.uuid4()
@@ -74,6 +77,7 @@ async def create_user(user: User):
                     "email": user.email,
                     "created": created,
                     "role": user.role,
+                    "discord_url": user.discord_url,
                 },
             )
             db.conn.commit()
@@ -87,11 +91,11 @@ async def create_user(user: User):
 @app.put("/user/")
 async def update_user(user: User):
     """Update existing user with user_id."""
-    sql = "UPDATE users SET role=%(role)s WHERE user_id=%(user_id)s RETURNING *"
+    sql = "UPDATE users SET role=%(role)s, discord_url=%(discord_url)s WHERE user_id=%(user_id)s RETURNING *"
 
     with db.conn.cursor(row_factory=class_row(User)) as cur:
         try:
-            cur.execute(sql, {"user_id": user.user_id, "role": user.role})
+            cur.execute(sql, {"user_id": user.user_id, "role": user.role, "discord_url": user.discord_url})
             db.conn.commit()
             return cur.fetchone()
         except Exception as ex:

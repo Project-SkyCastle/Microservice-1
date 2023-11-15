@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS users(
    user_id VARCHAR PRIMARY KEY,
    email VARCHAR (255) UNIQUE NOT NULL,
    created TIMESTAMP NOT NULL,
-   role VARCHAR NOT NULL 
+   role VARCHAR NOT NULL,
+   discord_url VARCHAR
 );

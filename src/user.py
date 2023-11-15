@@ -15,6 +15,7 @@ class User(BaseModel):
     email: Optional[str] = None
     created: Optional[datetime] = None
     role: Optional[str] = None
+    discord_url: Optional[str] = None
 
     @validator("role")
     def role_is_valid(cls, role):
