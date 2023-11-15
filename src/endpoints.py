@@ -4,6 +4,7 @@ import uuid
 from .user import User
 from .dbhandler import DbHandler
 from psycopg.rows import class_row
+from .publish_sns import send_sns_message
 
 app = FastAPI()
 db = DbHandler()
@@ -61,6 +62,7 @@ async def get_user(user_id: str):
 
 @app.post("/user/")
 async def create_user(user: User):
+
     """Creates a new user and returns the user's id."""
 
     sql = ("INSERT into users(user_id, email, created, role, discord_url) "
@@ -81,6 +83,19 @@ async def create_user(user: User):
                 },
             )
             db.conn.commit()
+
+            #get notifications
+            message_attributes = {
+                'webhook_url': {
+                    'DataType': 'String',
+                    'StringValue': user.discord_url
+                },
+            }
+
+            response = send_sns_message("Hi! You have just created a new user as " + user.role + " on SkyCastle.",
+                                        message_attributes)
+            print(response)
+
             return cur.fetchone()
 
         except Exception as ex:
@@ -97,6 +112,19 @@ async def update_user(user: User):
         try:
             cur.execute(sql, {"user_id": user.user_id, "role": user.role, "discord_url": user.discord_url})
             db.conn.commit()
+
+            #get notifications
+            message_attributes = {
+                'webhook_url': {
+                    'DataType': 'String',
+                    'StringValue': user.discord_url
+                },
+            }
+
+            response = send_sns_message("Hi! You have just updated a user on SkyCastle.",
+                                        message_attributes)
+            print(response)
+
             return cur.fetchone()
         except Exception as ex:
             print(ex)
@@ -110,10 +138,31 @@ async def delete_user(user_id: str):
 
     sql = "DELETE FROM users WHERE user_id=%(user_id)s"
 
+    sql1 = "SELECT role, discord_url FROM users WHERE user_id=%(user_id)s"
+
+
     with db.conn.cursor(row_factory=class_row(User)) as cur:
         try:
+            #get the user which wants to be deleted
+            cur.execute(sql1, {"user_id": user_id})
+            res = cur.fetchone()
+
+            #delete the user
             cur.execute(sql, {"user_id": user_id})
             db.conn.commit()
+
+            #get notifications
+            message_attributes = {
+                'webhook_url': {
+                    'DataType': 'String',
+                    'StringValue': res.discord_url
+                },
+            }
+
+            response = send_sns_message("Hi! You have just deleted a user with role " + res.role + " on SkyCastle.",
+                                        message_attributes)
+            print(response)
+
         except Exception as ex:
             db.conn.rollback()
             return ex
