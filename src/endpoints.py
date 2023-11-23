@@ -62,21 +62,18 @@ async def get_user(user_id: str):
 
 @app.post("/user/")
 async def create_user(user: User):
-
     """Creates a new user and returns the user's id."""
-
-    sql = ("INSERT into users(user_id, email, created, role, discord_url) "
-           "VALUES (%(user_id)s, %(email)s, %(created)s, %(role)s, %(discord_url)s) RETURNING *")
-    sql1 = "SELECT discord_url FROM users where role = 'ADMIN'"
+    sql = (
+        "INSERT into users(email, created, role, discord_url) "
+        "VALUES (%(email)s, %(created)s, %(role)s, %(discord_url)s) RETURNING *"
+    )
 
     with db.conn.cursor(row_factory=class_row(User)) as cur:
-        user_id = uuid.uuid4()
         created = datetime.now()
         try:
             cur.execute(
                 sql,
                 {
-                    "user_id": user_id,
                     "email": user.email,
                     "created": created,
                     "role": user.role,
@@ -87,41 +84,46 @@ async def create_user(user: User):
             this_user = cur.fetchone()
 
         except Exception as ex:
+            print(ex)
             db.conn.rollback()
             return ex
-
 
         if user.discord_url is not None:
             # get notifications
             message_attributes = {
-                'webhook_url': {
-                    'DataType': 'String',
-                    'StringValue': user.discord_url
-                },
+                "webhook_url": {"DataType": "String", "StringValue": user.discord_url},
             }
 
-            response = send_sns_message("Hi! You have just created a new user as " + user.role + " on SkyCastle.",
-                                        message_attributes)
+            response = send_sns_message(
+                "Hi! You have just created a new user as "
+                + user.role
+                + " on SkyCastle.",
+                message_attributes,
+            )
             print(response)
 
         # notify admins when a new analyst join
         if user.role == "ANALYST":
+            sql1 = "SELECT discord_url FROM users where role = 'ADMIN'"
             cur.execute(sql1)
             res = cur.fetchall()
 
             for row in res:
                 if row.discord_url is not None:
                     message_attributes = {
-                        'webhook_url': {
-                            'DataType': 'String',
-                            'StringValue': row.discord_url
+                        "webhook_url": {
+                            "DataType": "String",
+                            "StringValue": row.discord_url,
                         },
                     }
 
-                    response = send_sns_message("Hi SkyCastle admin! A new ANALYST has joined on SkyCastle.",
-                                                message_attributes)
+                    response = send_sns_message(
+                        "Hi SkyCastle admin! A new ANALYST has joined on SkyCastle.",
+                        message_attributes,
+                    )
                     print(response)
         return this_user
+
 
 @app.put("/user/")
 async def update_user(user: User):
@@ -138,7 +140,14 @@ async def update_user(user: User):
             return "User doesn't exist"
 
         try:
-            cur.execute(sql, {"user_id": user.user_id, "role": user.role, "discord_url": user.discord_url})
+            cur.execute(
+                sql,
+                {
+                    "user_id": user.user_id,
+                    "role": user.role,
+                    "discord_url": user.discord_url,
+                },
+            )
             db.conn.commit()
             this_user = cur.fetchone()
 
@@ -150,14 +159,12 @@ async def update_user(user: User):
         if user.discord_url is not None:
             # get notifications
             message_attributes = {
-                'webhook_url': {
-                    'DataType': 'String',
-                    'StringValue': user.discord_url
-                },
+                "webhook_url": {"DataType": "String", "StringValue": user.discord_url},
             }
 
-            response = send_sns_message("Hi! You have just updated a user on SkyCastle.",
-                                        message_attributes)
+            response = send_sns_message(
+                "Hi! You have just updated a user on SkyCastle.", message_attributes
+            )
             print(response)
 
         # notify admins when a new analyst join
@@ -168,14 +175,16 @@ async def update_user(user: User):
             for row in res:
                 if row.discord_url is not None:
                     message_attributes = {
-                        'webhook_url': {
-                            'DataType': 'String',
-                            'StringValue': row.discord_url
+                        "webhook_url": {
+                            "DataType": "String",
+                            "StringValue": row.discord_url,
                         },
                     }
 
-                    response = send_sns_message("Hi SkyCastle admin! A new ANALYST has joined on SkyCastle.",
-                                                    message_attributes)
+                    response = send_sns_message(
+                        "Hi SkyCastle admin! A new ANALYST has joined on SkyCastle.",
+                        message_attributes,
+                    )
                     print(response)
         return this_user
 
@@ -188,7 +197,6 @@ async def delete_user(user_id: str):
 
     sql1 = "SELECT role, discord_url FROM users WHERE user_id=%(user_id)s"
 
-
     with db.conn.cursor(row_factory=class_row(User)) as cur:
         # get the user which wants to be deleted
         cur.execute(sql1, {"user_id": user_id})
@@ -197,7 +205,7 @@ async def delete_user(user_id: str):
             return "User doesn't exist"
 
         try:
-            #delete the user
+            # delete the user
             cur.execute(sql, {"user_id": user_id})
             db.conn.commit()
 
@@ -205,18 +213,19 @@ async def delete_user(user_id: str):
             db.conn.rollback()
             return ex
 
-        #delete sucessfully, notification part
+        # delete sucessfully, notification part
         if res.discord_url is not None:
             # get notifications
             message_attributes = {
-                'webhook_url': {
-                    'DataType': 'String',
-                    'StringValue': res.discord_url
-                },
+                "webhook_url": {"DataType": "String", "StringValue": res.discord_url},
             }
 
-            response = send_sns_message("Hi! You have just deleted a user with role " + res.role + " on SkyCastle.",
-                                        message_attributes)
+            response = send_sns_message(
+                "Hi! You have just deleted a user with role "
+                + res.role
+                + " on SkyCastle.",
+                message_attributes,
+            )
             print(response)
 
         return {"Deleted": user_id}

@@ -11,7 +11,7 @@ class Role(str, Enum):
 
 
 class User(BaseModel):
-    user_id: Optional[str] = None
+    user_id: Optional[int] = None
     email: Optional[str] = None
     created: Optional[datetime] = None
     role: Optional[str] = None
