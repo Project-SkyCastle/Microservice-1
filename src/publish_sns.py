@@ -5,9 +5,9 @@ def send_sns_message(message, message_attributes):
 
     sns = boto3.client('sns',
                        region_name='us-east-1',
-                       aws_access_key_id="ASIAZCJCIC74WP65OBUK",
-                       aws_secret_access_key="WYGZhLv2uBqzRQt/MVnjc2VgBgXwspMJBZN3T1Xm",
-                       aws_session_token="FwoGZXIvYXdzEDEaDCCyXSmSJjrAMShaiyLEAWZnbubkUblLN7rLtlU8P/7psNBFMK0ZFpQBUblkA2/POrH+pXME97A+Q2u1b4YEZt3KAYIhQ87+vvlHoJQde5IhOudm0ijsgI3TszlWGhHa4mYRr8hlgtByPKqXboFQOvdw4e9eccwJqpVRSCmcI5aahPHW+EjLyv4tUMyAg+UVbU1fMWOIEUwB0wp1CzTf1yi1OOwu2KHQ0TGh7NMof9PerkoG6z8tKA5IY04oDyhsuzcWMAoxw09iTn4+EzurC4ivVSgoj5yIqwYyLeBeJpYrnPVbJzjtxaXpSceiYElLB1UpraEy6kxbYwhvFAJiqjqDqi74OAmduA=="
+                       aws_access_key_id="ASIAZCJCIC74YPLGCXHN",
+                       aws_secret_access_key="B8TkoU7/fSKz7RKLOA0rdL67//7CAalA/POuVgB1",
+                       aws_session_token="FwoGZXIvYXdzEDIaDPmWNk0DofL0nl0KwCLEAencCKRe9fJY/2/+qt6VXRmrkA4sx7VU5UtqqfVL2u9rTaUEl0fgK3lqc2UMxmgZxtiG5UbqjcUYGL1YujAO1ZjVFUwvV0hkjZNOtr+Uf73JCie5r+ZFJ2DuVtLA3Sxu4AEMkI/rxoNv1EroD6huiDOuPPyvwhydAtmc1QZEuYaVEPLAdbUdmKLKnX3sQ2TyJ77J3TxOK9StWERiRmj/Fpu2XuWjClur7a1DV9/IOBYrUwhLWfsWyOW+CqXaK7+SvA1RWywon8KIqwYyLXZTvWjSBf9mCcT7PoI7AAxyN0bl0KsgmKQOaJsagqumbphLxPe9td824/onWA=="
                        )
 
 
