@@ -13,3 +13,4 @@ uvicorn==0.23.2
 psycopg[binary]==3.1.12
 boto3
 pytest
+httpx
