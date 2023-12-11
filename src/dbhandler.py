@@ -5,7 +5,7 @@ from .user import User
 
 class DbHandler:
     def __init__(self):
-        self.reconnect()
+        pass
 
     def reconnect(self) -> None:
         self.conn = psycopg.connect(
