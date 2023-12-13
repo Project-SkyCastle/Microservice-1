@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from datetime import datetime
+import time
 from .user import User
 from .dbhandler import DbHandler
 from .publish_sns import send_sns_message
@@ -7,6 +8,16 @@ from .publish_sns import send_sns_message
 app = FastAPI()
 db = DbHandler()
 
+#Middleware functionality: logging request details
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    with open("request_log.txt", mode="a") as reqfile:
+        content = f"Method: {request.method}, Path: {request.url.path}, Response_status: {response.status_code}, Duration: {process_time}s\n"
+        reqfile.write(content)
+    return response
 
 @app.get("/")
 async def root():
