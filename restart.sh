@@ -5,6 +5,6 @@ if [ ! -z "${pid}" ]; then
     kill $pid
 fi
 
-cd ~/Microservice-1"/ && git pull -f origin main && python3 -m pip install -r requirements.txt && python3 main.py > service.log &
+cd ~/Microservice-1/ && python3 -m pip install -r requirements.txt && python3 main.py
 
 exit 0
