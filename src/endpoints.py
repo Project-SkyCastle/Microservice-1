@@ -1,14 +1,15 @@
 from fastapi import FastAPI, Request
-from datetime import datetime
+from datetime import datetime, date
 import time
-from .user import User
+from .user import User, Role
 from .dbhandler import DbHandler
 from .publish_sns import send_sns_message
 
 app = FastAPI()
 db = DbHandler()
 
-#Middleware functionality: logging request details
+
+# Middleware functionality: logging request details
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
@@ -18,6 +19,7 @@ async def log_requests(request: Request, call_next):
         content = f"Method: {request.method}, Path: {request.url.path}, Response_status: {response.status_code}, Duration: {process_time}s\n"
         reqfile.write(content)
     return response
+
 
 @app.get("/")
 async def root():
@@ -60,6 +62,57 @@ async def get_user(user_id: str):
         "role": res.role,
         "discord_url": res.discord_url,
     }
+
+
+@app.get("/user/search/")
+async def get_user(
+    email: str = "",
+    created_on_or_after: date = date(1970, 1, 1),
+    role: str = "",
+    discord_url: str = "",
+):
+    """Fetch all users matching the query string."""
+
+    filters = []
+    params = {}
+
+    if email != "":
+        params["email"] = email
+        filters.append("email=%(email)s")
+
+    if created_on_or_after != date(1970, 1, 1):
+        params["created"] = created_on_or_after
+        filters.append("created>=%(created)s")
+
+    if role != "":
+        params["role"] = Role[role]
+        filters.append("role=%(role)s")
+
+    if discord_url != "":
+        params["discord_url"] = discord_url
+        filters.append("discord_url=%(discord_url)s")
+
+    if len(params) == 0:
+        return []
+
+    predicates = " and ".join(filters)
+
+    sql = (
+        "SELECT user_id, email, created, role, discord_url FROM users WHERE "
+        + predicates
+    )
+    res = db.execute_with_retry(sql, params).fetchall()
+
+    return [
+        {
+            "user_id": row.user_id,
+            "email": row.email,
+            "created": row.created,
+            "role": row.role,
+            "discord_url": row.discord_url,
+        }
+        for row in res
+    ]
 
 
 @app.post("/user/")
