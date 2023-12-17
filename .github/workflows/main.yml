@@ -22,8 +22,6 @@ jobs:
           REMOTE_USER: "ec2-user"
           TARGET: "/home/ec2-user/"
           SCRIPT_AFTER: |
-            whoami
-            ls -al
-            echo $RSYNC_STDOUT
+            exec ~/6156Project_SkyCastle-Microservice1/restart.sh
 
           
