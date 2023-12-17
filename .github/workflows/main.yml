@@ -21,5 +21,6 @@ jobs:
           REMOTE_HOST: "ec2-3-144-38-237.us-east-2.compute.amazonaws.com"
           REMOTE_USER: "ec2-user"
           TARGET: "/home/ec2-user/"
-          SCRIPT_AFTER: cd ~/6156Project_SkyCastle-Microservice1/ && exec ./restart.sh
+          SCRIPT_AFTER: cd ~/6156Project_SkyCastle-Microservice1/ && exec ./restart.sh && echo $RSYNC_STDOUT
+
           
