@@ -6,27 +6,18 @@ import subprocess
 tempfile = "tempfile"
 
 
-def find_main(p):
-    return (
-        p.info["name"].lower() == "python"
-        and p.info["cmdline"]
-        and "main.py" in p.info["cmdline"][-1]
-    )
-
-
 def restart():
-    processes = [
-        p for p in psutil.process_iter(attrs=["pid", "name", "cmdline"]) if find_main(p)
-    ]
+    try: 
+        with open("/tmp/path.txt", "r") as f:
+            pid = f.readline()
+            if pid:
+                print("pid=", pid)
+        process = psutil.Process(int(pid))
+        process.terminate()
+    except Exception as e:
+        print(e)
 
-    print(processes)
-
-    if processes:
-        print("terminating ", processes[0])
-        processes[0].terminate()
-
-    subprocess.check_call(["python3", "-m", "pip", "install", "-r", "requirements.txt"])
-
+    print("starting main.py...")
     subprocess.Popen(
         [
             "python3",
@@ -45,12 +36,14 @@ def check_new_tempfile():
     prev_mtime = os.path.getmtime(tempfile)
 
     while True:
-        curr_mtime = os.path.getmtime(tempfile)
-        if prev_mtime != curr_mtime:
-            print("Found new tempfile")
-            restart()
-            prev_mtime = curr_mtime
-
+        try:
+            curr_mtime = os.path.getmtime(tempfile)
+            if prev_mtime != curr_mtime:
+                print("Found new tempfile")
+                restart()
+                prev_mtime = curr_mtime
+        except Exception as e:
+            print(e)
         sleep(1)
 
 
