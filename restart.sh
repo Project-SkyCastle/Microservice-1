@@ -5,6 +5,6 @@ if [ ! -z "${pid}" ]; then
     kill $pid
 fi
 
-cd ~/6156Project_SkyCastle-Microservice1/ && git pull -f origin main && python3 -m pip install -r requirements.txt && python3 main.py > service.log &
+cd ~/Microservice-1"/ && git pull -f origin main && python3 -m pip install -r requirements.txt && python3 main.py > service.log &
 
 exit 0
