@@ -22,6 +22,6 @@ jobs:
           REMOTE_USER: "ec2-user"
           TARGET: "/home/ec2-user/Microservice-1"
           SCRIPT_AFTER: |
-            exec /home/ec2-user/Microservice-1/restart.sh
+            touch /home/ec2-user/Microservice-1/tempfile
 
           
