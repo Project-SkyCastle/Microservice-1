@@ -22,6 +22,6 @@ jobs:
           REMOTE_USER: "ec2-user"
           TARGET: "/home/ec2-user/"
           SCRIPT_AFTER: |
-            /home/ec2-user/6156Project_SkyCastle-Microservice1/restart.sh
+            exec /home/ec2-user/6156Project_SkyCastle-Microservice1/restart.sh
 
           
