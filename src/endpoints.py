@@ -26,7 +26,7 @@ async def root():
     return {"message": "Hello SkyCastle Team"}
 
 
-@app.get("/user/")
+@app.get("/user")
 async def get_all_users():
     """Fetch all users."""
 
@@ -45,7 +45,7 @@ async def get_all_users():
 
 
 @app.get("/user/{user_id}")
-async def get_user(user_id: str):
+async def get_user(user_id: int):
     """Fetch the user info with user_id=user_id."""
 
     sql = "SELECT user_id, email, created, role, discord_url FROM users WHERE user_id=%(user_id)s"
@@ -115,7 +115,7 @@ async def get_user(
     ]
 
 
-@app.post("/user/")
+@app.post("/user")
 async def create_user(user: User):
     """Creates a new user and returns the user's id."""
     sql = (
@@ -167,7 +167,7 @@ async def create_user(user: User):
     return this_user
 
 
-@app.put("/user/")
+@app.put("/user")
 async def update_user(user: User):
     """Update existing user with user_id."""
 
@@ -219,7 +219,7 @@ async def update_user(user: User):
 
 
 @app.delete("/user/{user_id}")
-async def delete_user(user_id: str):
+async def delete_user(user_id: int):
     """Deletes user with user_id."""
 
     sql = "DELETE FROM users WHERE user_id=%(user_id)s returning *"

@@ -28,7 +28,7 @@ def test_get_all_users(db):
     cursor.fetchall.return_value = [user]
     db.execute_with_retry.return_value = cursor
 
-    response = client.get("/user/")
+    response = client.get("/user")
     assert response.status_code == 200
     assert db.execute_with_retry.called_with(
         "SELECT user_id, email, created, role, discord_url FROM users"
