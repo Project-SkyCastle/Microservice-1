@@ -1,7 +1,8 @@
 pid=$(ps -ef | grep "python main.py" | grep -v grep | awk '{print $2}')
 
 if [ ! -z "${pid}" ]; then
-    kill pid
+    echo "killing ${pid}"
+    kill $pid
 fi
 
 cd ~/6156Project_SkyCastle-Microservice1/ &&
