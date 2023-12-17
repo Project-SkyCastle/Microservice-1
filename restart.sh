@@ -7,4 +7,6 @@ fi
 cd ~/6156Project_SkyCastle-Microservice1/ &&
 git pull -f origin main && python3 -m virtualenv .venv && source .venv/bin/activate &&  python -m pip install -r requirements.txt && python main.py
 
+echo "successfully restarted service."
+
 exit 0
