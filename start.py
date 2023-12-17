@@ -28,7 +28,12 @@ def restart():
     subprocess.check_call(["python3", "-m", "pip", "install", "-r", "requirements.txt"])
 
     subprocess.Popen(
-        ["python3", "/home/ec2-user/Microservice-1/main.py", ">>", "service.log"],
+        [
+            "python3",
+            "/home/ec2-user/Microservice-1/main.py",
+            ">>",
+            "/home/ec2-user/Microservice-1/service.log",
+        ],
         close_fds=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
