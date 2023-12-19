@@ -1,6 +1,7 @@
 import psycopg
 from psycopg.rows import class_row
 from .user import User
+import logging
 
 
 class DbHandler:
@@ -15,7 +16,7 @@ class DbHandler:
             autocommit=True,
         )
 
-        print("Connected")
+        logging.info("Connected")
 
     def execute_with_retry(
         self, sql: str, args: dict = None, retry: int = 3

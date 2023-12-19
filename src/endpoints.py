@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from datetime import datetime, date
 import time
+import logging
 from .user import User, Role
 from .dbhandler import DbHandler
 from .publish_sns import send_sns_message
@@ -29,9 +30,13 @@ async def root():
 @app.get("/user")
 async def get_all_users():
     """Fetch all users."""
+    logging.info("get_all_users() called")
 
     sql = "SELECT user_id, email, created, role, discord_url FROM users"
     res = db.execute_with_retry(sql).fetchall()
+
+    logging.info(res)
+
     return [
         {
             "user_id": row.user_id,
@@ -47,13 +52,16 @@ async def get_all_users():
 @app.get("/user/{user_id}")
 async def get_user(user_id: int):
     """Fetch the user info with user_id=user_id."""
+    logging.info("get_user() called")
 
     sql = "SELECT user_id, email, created, role, discord_url FROM users WHERE user_id=%(user_id)s"
     res = db.execute_with_retry(sql, {"user_id": user_id}).fetchone()
 
     if res is None:
-        print(f"Could not find user_id={user_id}")
+        logging.error("Could not find user_id=%(user_id)s", user_id)
         return None
+
+    logging.info(res)
 
     return {
         "user_id": res.user_id,
@@ -65,13 +73,14 @@ async def get_user(user_id: int):
 
 
 @app.get("/user/search/")
-async def get_user(
+async def search_user(
     email: str = "",
     created_on_or_after: date = date(1970, 1, 1),
     role: str = "",
     discord_url: str = "",
 ):
     """Fetch all users matching the query string."""
+    logging.info("search_user() called")
 
     filters = []
     params = {}
@@ -103,6 +112,8 @@ async def get_user(
     )
     res = db.execute_with_retry(sql, params).fetchall()
 
+    logging.info(res)
+
     return [
         {
             "user_id": row.user_id,
@@ -118,6 +129,8 @@ async def get_user(
 @app.post("/user")
 async def create_user(user: User):
     """Creates a new user and returns the user's id."""
+    logging.info("create_user() called")
+
     sql = (
         "INSERT into users(email, created, role, discord_url) "
         "VALUES (%(email)s, %(created)s, %(role)s, %(discord_url)s) RETURNING *"
@@ -143,7 +156,7 @@ async def create_user(user: User):
             "Hi! You have just created a new user as " + user.role + " on SkyCastle.",
             message_attributes,
         )
-        print(response)
+        logging.info(response)
 
     # notify admins when a new analyst join
     if user.role == "ANALYST":
@@ -163,13 +176,14 @@ async def create_user(user: User):
                     "Hi SkyCastle admin! A new ANALYST has joined on SkyCastle.",
                     message_attributes,
                 )
-                print(response)
+                logging.info(response)
     return this_user
 
 
 @app.put("/user")
 async def update_user(user: User):
     """Update existing user with user_id."""
+    logging.info("update_user() called")
 
     sql = "UPDATE users SET role=%(role)s, discord_url=%(discord_url)s WHERE user_id=%(user_id)s RETURNING *"
     sql1 = "SELECT discord_url FROM users where role = 'ADMIN'"
@@ -195,7 +209,7 @@ async def update_user(user: User):
         response = send_sns_message(
             "Hi! You have just updated a user on SkyCastle.", message_attributes
         )
-        print(response)
+        logging.info(response)
 
     # notify admins when a new analyst join
     if user.role == "ANALYST":
@@ -214,13 +228,14 @@ async def update_user(user: User):
                     "Hi SkyCastle admin! A new ANALYST has joined on SkyCastle.",
                     message_attributes,
                 )
-                print(response)
+                logging.info(response)
     return this_user
 
 
 @app.delete("/user/{user_id}")
 async def delete_user(user_id: int):
     """Deletes user with user_id."""
+    logging.info("delete_user() called")
 
     sql = "DELETE FROM users WHERE user_id=%(user_id)s returning *"
 
@@ -244,6 +259,6 @@ async def delete_user(user_id: int):
             + " on SkyCastle.",
             message_attributes,
         )
-        print(response)
+        logging.info(response)
 
     return {"Deleted": user_id}

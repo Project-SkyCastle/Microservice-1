@@ -1,4 +1,5 @@
 import boto3
+import logging 
 
 def send_sns_message(message, message_attributes):
     # Create an SNS client
@@ -19,8 +20,8 @@ def send_sns_message(message, message_attributes):
             Message=message,
             MessageAttributes=message_attributes
         )
-        print(f"Message sent with ID: {response['MessageId']}")
+        logging.info(f"Message sent with ID: {response['MessageId']}")
         return response
     except Exception as e:
-        print(f"An error occured: {e}")
+        logging.error(f"An error occured: {e}")
         return None
