@@ -22,7 +22,7 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
         level=logging.DEBUG,
     )
-
+    logging.info("::: APPLICATION STARTED :::")
     write_pid()
     db.reconnect()
     uvicorn.run(app, host="0.0.0.0", port=8012)
