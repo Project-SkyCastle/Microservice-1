@@ -5,8 +5,18 @@ import logging
 from .user import User, Role
 from .dbhandler import DbHandler
 from .publish_sns import send_sns_message
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 db = DbHandler()
 
 
